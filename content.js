@@ -19,7 +19,7 @@ function loadProjectsContent() {
             <h3>${project.name}</h3>
             <p>${project.description}</p>
             <p><strong>Technologies used:</strong> ${project.technologies}</p>
-            <a href="${project.link}" target="_blank">View on GitHub</a>
+            <a href="${project.link}" target="_blank">Project Link</a>
         `;
         projectsContainer.appendChild(projectElement);
     });

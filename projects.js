@@ -4,14 +4,14 @@ const projectsContent = [
     {
         name: "Project Name 1",
         description: "A brief description of your first project. What problem does it solve? What technologies did you use? What was your role in the project?",
-        technologies: "List the main technologies, frameworks, or languages used.",
+        //technologies: "To be build",
         link: "https://github.com/yourusername/project1"
     },
     {
-        name: "Project Name 2",
-        description: "Description of your second project. Highlight any challenging aspects you overcame or innovative features you implemented.",
-        technologies: "List the main technologies, frameworks, or languages used.",
-        link: "https://github.com/yourusername/project2"
+        name: "Partial Correlation Calculator",
+        description: "A tool to calculate the partial correlation matrix based on user input.",
+        technologies: "JavaScript, HTML, CSS",
+        link: "partial-correlation.html"
     }
     // Add more projects as needed
 ];
