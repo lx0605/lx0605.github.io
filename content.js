@@ -1,5 +1,9 @@
 // content.js
 
+function loadHomeContent() {
+    document.getElementById('home-content').innerHTML = homeContent;
+}
+
 function loadBioContent() {
     document.getElementById('bio-content').innerHTML = bioContent;
 }
@@ -21,8 +25,35 @@ function loadProjectsContent() {
     });
 }
 
-// Load content when the page is ready
+function setupNavigation() {
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('section');
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = link.getAttribute('data-target');
+
+            // Update active class on nav links
+            navLinks.forEach(navLink => navLink.classList.remove('active'));
+            link.classList.add('active');
+
+            // Show target section, hide others
+            sections.forEach(section => {
+                if (section.id === targetId) {
+                    section.classList.add('active');
+                } else {
+                    section.classList.remove('active');
+                }
+            });
+        });
+    });
+}
+
+// Load content and setup navigation when the page is ready
 document.addEventListener('DOMContentLoaded', () => {
+    loadHomeContent();
     loadBioContent();
     loadProjectsContent();
+    setupNavigation();
 });
