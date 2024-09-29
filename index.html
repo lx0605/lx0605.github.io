@@ -3,50 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Name - GitHub Profile</title>
+    <title>Xiao Luo - Personal Website</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-        }
-        header {
-            background-color: #f4f4f4;
-            text-align: center;
-            padding: 1rem;
-        }
-        main {
-            max-width: 800px;
-            margin: auto;
-        }
-        .project {
-            margin-bottom: 20px;
-        }
+        /* ... (keep the existing CSS) ... */
     </style>
 </head>
 <body>
     <header>
-        <h1>Your Name</h1>
+        <h1>Xiao Luo</h1>
         <p>Web Developer | GitHub Enthusiast</p>
     </header>
+    <nav>
+        <ul>
+            <li><a href="#bio">Bio</a></li>
+            <li><a href="#projects">Projects</a></li>
+        </ul>
+    </nav>
     <main>
-        <section id="about">
-            <h2>About Me</h2>
-            <p>Brief introduction about yourself and your skills.</p>
+        <section id="bio">
+            <h2>Bio</h2>
+            <div id="bio-content"></div>
         </section>
+        
         <section id="projects">
-            <h2>My Projects</h2>
-            <div class="project">
-                <h3>Project Name</h3>
-                <p>Project description and link to the repository.</p>
-            </div>
-            <!-- Add more project divs as needed -->
-        </section>
-        <section id="contact">
-            <h2>Contact</h2>
-            <p>Your contact information or links to social profiles.</p>
+            <h2>Projects</h2>
+            <div id="projects-content"></div>
         </section>
     </main>
+    <script src="bio.js"></script>
+    <script src="projects.js"></script>
+    <script src="content.js"></script>
 </body>
 </html>
