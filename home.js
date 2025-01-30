@@ -11,8 +11,8 @@ const homeContent = `
   <p>
     I'm an Earth Scientist and computational modeler passionate about solving 
     subsurface challenges—from carbon storage to contaminant transport . 
-    I combine high-resolution geological simulations, reactive transport modeling ⚙️, 
-    and machine learning (PyTorch, TensorFlow) to build tools for sustainable 
+    I combine high-resolution geological simulations, reactive transport modeling, 
+    and machine learning (PyTorch) to build tools for sustainable 
     energy systems. 
   </p>
   <p>
