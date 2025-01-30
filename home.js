@@ -16,8 +16,10 @@ const homeContent = `
     energy systems. 
   </p>
   <p>
-    Here, you'll find open-source projects bridging geophysics, reservoir engineering, 
-    and Python-based workflows. Let's work together for a greener planet! 🌍.
+    I am a passionate advocate for the open-source community. Here, I will gradually share 
+    tools and workflows to empower others in geophysics, reservoir engineering, and Python-based modeling. 
+    Explore my repositories for projects bridging computational geoscience and sustainability
+    —let us collaborate for a greener planet! 🌍.
   </p>
   <p>Explore my bio and projects to learn more about my work and experiences. </p>
 `;
