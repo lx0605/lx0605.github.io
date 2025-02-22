@@ -8,22 +8,49 @@ function loadBioContent() {
     document.getElementById('bio-content').innerHTML = bioContent;
 }
 
+// function loadProjectsContent() {
+//     const projectsContainer = document.getElementById('projects-content');
+//     projectsContainer.innerHTML = '';
+    
+//     projectsContent.forEach(project => {
+//         const projectElement = document.createElement('div');
+//         projectElement.className = 'project';
+//         projectElement.innerHTML = `
+//             <h3>${project.name}</h3>
+//             <p>${project.description}</p>
+//             <p><strong>Tools used:</strong> ${project.technologies}</p>
+//             <a href="${project.link}" target="_blank">Project Link</a>
+//         `;
+//         projectsContainer.appendChild(projectElement);
+//     });
+// }
+
 function loadProjectsContent() {
     const projectsContainer = document.getElementById('projects-content');
     projectsContainer.innerHTML = '';
-    
+
     projectsContent.forEach(project => {
         const projectElement = document.createElement('div');
         projectElement.className = 'project';
+
+        let imagesHtml = '';
+        if (project.images && project.images.length > 0) {
+            project.images.forEach(imagePath => {
+                imagesHtml += `<img src="${imagePath}" alt="${project.name} Image" style="max-width: 200px; margin-right: 10px;">`; // Adjust styling as needed
+            });
+        }
+
         projectElement.innerHTML = `
             <h3>${project.name}</h3>
+            ${imagesHtml}
             <p>${project.description}</p>
-            <p><strong>Technologies used:</strong> ${project.technologies}</p>
+            <p><strong>Tools used:</strong> ${project.technologies}</p>
             <a href="${project.link}" target="_blank">Project Link</a>
         `;
         projectsContainer.appendChild(projectElement);
     });
 }
+
 
 function setupNavigation() {
     const navLinks = document.querySelectorAll('.nav-link');

@@ -2,8 +2,11 @@
 
 const projectsContent = [
     {
-        name: "Project Name 1",
-        description: "A brief description of your first project. What problem does it solve? What technologies did you use? What was your role in the project?",
+        name: "Simulating Seismic Wavelet Propagation with PyTorch",
+        description: "This article explores the use of PyTorch tensors to simulate seismic wavelet propagation" +
+                    " and solve the inverse problem for calculating material properties using a neural network-inspired approach" +
+                    " $ \\frac{\\partial^2 u(x, t)}{\\partial t^2} = c^2 \\nabla^2 u(x, t)$",
+        technologies: "Python, PyTorch",
         //technologies: "To be build",
         link: "https://github.com/yourusername/project1"
     },
