@@ -8,7 +8,8 @@ const projectsContent = [
                     " $ \\frac{\\partial^2 u(x, t)}{\\partial t^2} = c^2 \\nabla^2 u(x, t)$",
         technologies: "Python, PyTorch",
         //technologies: "To be build",
-        link: "https://github.com/yourusername/project1"
+        link: "https://github.com/yourusername/project1",
+        images: ["images/model_mesh_1.png", "images/model_mesh_2.png"]
     },
     {
         name: "Partial Correlation Calculator",
