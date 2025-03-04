@@ -30,7 +30,7 @@ function loadProjectsContent() {
           ${imagesHtml}
           <p>${project.description}</p>
           <p><strong>Tools used:</strong> ${project.technologies}</p>
-          <a href="${project.link}" target="_blank">Project Link</a>
+          <a href="${project.link}" target="_blank">Link</a>
       `;
       projectsContainer.appendChild(projectElement);
     });
