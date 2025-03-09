@@ -27,7 +27,7 @@ const projectsContent = [
                     The refined mesh can be directly applied to reactive transport modeling. The results shown here were exported from PFLOTRAN in XDMF format.
                     One notable feature is that hexahedron elements are used in both grid mesh. I shall discuess why I prefer hexahedron over tetrahedron (triangulated) elements in the future. 
                     `,
-        technologies: "Scipy, PyVista, Paraview, PFLOTRAN",       
+        technologies: "Scipy, PyVista, Paraview, LaGriT, PFLOTRAN",       
         images: ["images/refine_01.png", "images/refine_02.png"]
     },
    
