@@ -12,8 +12,8 @@ const bioContent = `
     hydrocarbon recoveries in uncoventional reservoirs, such as shale/tight oil. The main research objective is to minimize water usage and increase oil permeability
     through gas and surfactant alternatives. I conducted both experimental work, such as gas injection, core-floods, and CT scans. I also developed numerical models for
     geophysical characterization and simulations for compositional displacement and oil recovery processes. 
-
 </p>
+
 <p> Education: 
     <ul>
         <li> Ph.D. in Petroleum and Geosystems Engineering, University of Texas at Austin, Austin, Texas, U.S.A. 2020 </li>
