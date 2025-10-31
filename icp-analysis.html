@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SX Experiment Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@500;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .font-mono {
+            font-family: 'Roboto Mono', monospace;
+        }
+        
+        /* Style for the editable cells */
+        [contenteditable="true"] {
+            position: relative;
+            outline: 2px solid transparent;
+            transition: all 0.2s ease-in-out;
+            border-radius: 4px;
+            padding: 2px 4px;
+        }
+
+        [contenteditable="true"]:focus {
+            outline: 2px solid #4f46e5; /* indigo-600 */
+            background-color: #ffffff;
+            z-index: 10;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+        
+        .cell-id {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            background: #4f46e5;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 4px;
+            border-radius: 4px;
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+            pointer-events: none;
+        }
+        
+        [contenteditable="true"]:focus + .cell-id,
+        [contenteditable="true"]:hover + .cell-id {
+            opacity: 1;
+        }
+
+        /* Style for parameter inputs */
+        .param-input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #D1D5DB; /* gray-300 */
+            border-radius: 6px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .param-input:focus {
+            outline: none;
+            border-color: #4f46e5; /* indigo-600 */
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+        .param-label {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #4B5563; /* gray-600 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-4 sm:p-8">
+
+    <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+        <header class="p-6 bg-gradient-to-r from-indigo-700 to-purple-800">
+            <h1 class="text-2xl font-bold text-white">Advanced Solvent Extraction (SX) Calculator</h1>
+            <p class="text-indigo-100 mt-1">Live calculations based on your ICP data. Edit parameters or cell values to see live results.</p>
+        </header>
+
+        <!-- Experimental Parameters -->
+        <div class="p-6 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Experimental Parameters</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div>
+                    <label for="v_aq_initial" class="param-label">Initial Brine (mL)</label>
+                    <input type="number" id="v_aq_initial" class="param-input" value="25">
+                </div>
+                <div>
+                    <label for="v_org_initial" class="param-label">Initial Organic (mL)</label>
+                    <input type="number" id="v_org_initial" class="param-input" value="25">
+                </div>
+                <div>
+                    <label for="m_org_strip_sample" class="param-label">Org. Strip Mass (g)</label>
+                    <input type="number" id="m_org_strip_sample" class="param-input" value="5">
+                </div>
+                <div>
+                    <label for="v_aq_strip" class="param-label">Strip Solution (mL)</label>
+                    <input type="number" id="v_aq_strip" class="param-input" value="10">
+                </div>
+                <div>
+                    <label for="rho_org" class="param-label">Org. Density (g/mL)</label>
+                    <input type="number" id="rho_org" class="param-input" value="0.8">
+                </div>
+                <div>
+                    <label for="rho_brine" class="param-label">Brine Density (g/mL)</label>
+                    <input type="number" id="rho_brine" class="param-input" value="1.2">
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+                <thead class="bg-gray-100 text-xs text-gray-600 uppercase">
+                    <tr>
+                        <th class="p-3 font-semibold"></th>
+                        <th class="p-3 font-semibold">A</th>
+                        <th class="p-3 font-semibold">B</th>
+                        <th class="p-3 font-semibold">C</th>
+                        <th class="p-3 font-semibold">D</th>
+                        <th class="p-3 font-semibold">E</th>
+                        <th class="p-3 font-semibold">F</th>
+                        <th class="p-3 font-semibold">G</th>
+                        <th class="p-3 font-semibold">H</th>
+                        <th class="p-3 font-semibold">I</th>
+                        <th class="p-3 font-semibold">J</th>
+                        <th class="p-3 font-semibold">K</th>
+                    </tr>
+                    <tr class="border-b border-gray-200">
+                        <th class="p-3 w-56 text-left">1</th>
+                        <th class="p-3 w-56 text-left">Label</th>
+                        <th class="p-3">P</th>
+                        <th class="p-3">S</th>
+                        <th class="p-3">Zn</th>
+                        <th class="p-3">Mn</th>
+                        <th class="p-3">Fe</th>
+                        <th class="p-3">Mg</th>
+                        <th class="p-3">Ca</th>
+                        <th class="p-3">K</th>
+                        <th class="p-3">Na</th>
+                        <th class="p-3 w-32">Dilution Factor</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-3 font-semibold bg-gray-100">2</td>
+                        <td class="p-3 font-medium text-gray-800">proxyBrine</td>
+                        <td class="p-3 relative" contenteditable="true" id="B2">0.009<span class="cell-id">B2</span></td>
+                        <td class="p-3 relative" contenteditable="true" id="C2">0.305<span class="cell-id">C2</span></td>
+                        <td class="p-3 relative bg-yellow-100 font-bold text-indigo-800" contenteditable="true" id="D2">0.470<span class="cell-id">D2</span></td>
+                        <td class="p-3 relative bg-yellow-100 font-bold text-indigo-800" contenteditable="true" id="E2">0.943<span class="cell-id">E2</span></td>
+                        <td class="p-3 relative" contenteditable="true" id="F2">0.002<span class="cell-id">F2</span></td>
+                        <td class="p-3 relative" contenteditable="true" id="G2">0.003<span class="cell-id">G2</span></td>
+                        <td class="p-3 relative bg-yellow-100 font-bold text-indigo-800" contenteditable="true" id="H2">28.792<span class="cell-id">H2</span></td>
+                        <td class="p-3 relative" contenteditable="true" id="I2">1.001<span class="cell-id">I2</span></td>
+                        <td class="p-3 relative" contenteditable="true" id="J2">58.202<span class="cell-id">J2</span></td>
+                        <td class_INPUT="p-3"><input type="number" id="dil_brine" class="param-input" value="1000"></td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-3 font-semibold bg-gray-100">3</td>
+                        <td class="p-3 font-medium text-gray-800">proxyBrine_aq_C923_2</td>
+                        <td class="p-3 relative" contenteditable="true" id="B3">0.014<span class="cell-id">B3</span></td>
+                        <td class="p-3 relative" contenteditable="true" id="C3">0.295<span class="cell-id">C3</span></td>
+                        <td class="p-3 relative bg-yellow-100 font-bold text-indigo-800" contenteditable="true" id="D3">0.033<span class="cell-id">D3</span></td>
+                        <td class="p-3 relative bg-yellow-100 font-bold text-indigo-800" contenteditable="true" id="E3">0.905<span class="cell-id">E3</span></td>
+                        <td class="p-3 relative" contenteditable="true" id="F3">0.004<span class="cell-id">F3</span></td>
+                        <td class="p-3 relative" contenteditable="true" id="G3">0.003<span class="cell-id">G3</span></td>
+                        <td class="p-3 relative bg-yellow-100 font-bold text-indigo-800" contenteditable="true" id="H3">27.490<span class="cell-id">H3</span></td>
+                        <td class="p-3 relative" contenteditable="true" id="I3">0.965<span class="cell-id">I3</span></td>
+                        <td class="p-3 relative" contenteditable="true" id="J3">56.436<span class="cell-id">J3</span></td>
+                        <td class="p-3"><input type="number" id="dil_aq_post" class="param-input" value="1000"></td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-3 font-semibold bg-gray-100">4</td>
+                        <td class="p-3 font-medium text-gray-800">proxyBrine_WaterStrip_C923_2</td>
+                        <td class="p-3 relative" contenteditable="true" id="B4">0.018<span class="cell-id">B4</span></td>
+                        <td class="p-3 relative" contenteditable="true" id="C4">0.113<span class="cell-id">C4</span></td>
+                        <td class="p-3 relative bg-yellow-100 font-bold text-indigo-800" contenteditable="true" id="D4">0.309<span class="cell-id">D4</span></td>
+                        <td class="p-3 relative bg-yellow-100 font-bold text-indigo-800" contenteditable="true" id="E4">0.006<span class="cell-id">E4</span></td>
+                        <td class="p-3 relative" contenteditable="true" id="F4">0.004<span class="cell-id">F4</span></td>
+                        <td class="p-3 relative" contenteditable="true" id="G4">0.003<span class="cell-id">G4</span></td>
+                        <td class="p-3 relative" contenteditable="true" id="H4">0.208<span class="cell-id">H4</span></td>
+                        <td class="p-3 relative" contenteditable="true" id="I4">0.037<span class="cell-id">I4</span></td>
+                        <td class="p-3 relative" contenteditable="true" id="J4">0.087<span class="cell-id">J4</span></td>
+                        <td class="p-3"><input type="number" id="dil_strip" class="param-input" value="1000"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Calculation Results -->
+        <div class="p-6 bg-gray-50 border-t border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Calculation Results</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                <!-- Zn Extraction Efficiency -->
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium text-gray-700">Zn Extraction Efficiency (E%)</span>
+                        <span id="result-e" class="font-mono text-xl font-bold text-green-600 bg-green-50 px-3 py-1 rounded-md">...</span>
+                    </div>
+                    <code class="block text-xs text-gray-500 mt-2 bg-gray-100 p-2 rounded-md whitespace-nowrap overflow-x-auto">= ( (D2*dil_brine) - (D3*dil_aq_post) ) / (D2*dil_brine)</code>
+                </div>
+                
+                <!-- Dynamic Overall Recovery Rate -->
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium text-gray-700">Element Overall Recovery (Y%)</span>
+                        <select id="recovery-select" class="calc-select param-input w-20 p-1 text-sm">
+                            <option value="P">P</option>
+                            <option value="S">S</option>
+                            <option value="Zn" selected>Zn</option>
+                            <option value="Mn">Mn</option>
+                            <option value="Fe">Fe</option>
+                            <option value="Mg">Mg</option>
+                            <option value="Ca">Ca</option>
+                            <option value="K">K</option>
+                            <option value="Na">Na</option>
+                        </select>
+                        <span id="result-y-dynamic" class="font-mono text-xl font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-md">...</span>
+                    </div>
+                    <code class="block text-xs text-gray-500 mt-2 bg-gray-100 p-2 rounded-md whitespace-nowrap overflow-x-auto" title="= ( (X4*dil_strip) * v_aq_strip * v_org_initial * rho_org ) / ( (X2*dil_brine) * v_aq_initial * m_org_strip_sample )">Dynamic Formula (see JS)</code>
+                </div>
+
+                <!-- Dynamic Selectivity -->
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium text-gray-700">Selectivity (β A/B)</span>
+                        <div class="flex items-center gap-1">
+                            <select id="select-a" class="calc-select param-input w-20 p-1 text-sm">
+                                <option value="P">P</option>
+                                <option value="S">S</option>
+                                <option value="Zn" selected>Zn</option>
+                                <option value="Mn">Mn</option>
+                                <option value="Fe">Fe</option>
+                                <option value="Mg">Mg</option>
+                                <option value="Ca">Ca</option>
+                                <option value="K">K</option>
+                                <option value="Na">Na</option>
+                            </select>
+                            <span class="text-gray-500">/</span>
+                            <select id="select-b" class="calc-select param-input w-20 p-1 text-sm">
+                                <option value="P">P</option>
+                                <option value="S">S</option>
+                                <option value="Zn">Zn</option>
+                                <option value="Mn" selected>Mn</option>
+                                <option value="Fe">Fe</option>
+                                <option value="Mg">Mg</option>
+                                <option value="Ca">Ca</option>
+                                <option value="K">K</option>
+                                <option value="Na">Na</option>
+                            </select>
+                        </div>
+                        <span id="result-b-dynamic" class="font-mono text-xl font-bold text-purple-600 bg-purple-50 px-3 py-1 rounded-md">...</span>
+                    </div>
+                    <code class="block text-xs text-gray-500 mt-2 bg-gray-100 p-2 rounded-md whitespace-nowrap overflow-x-auto">= D_element_A / D_element_B</code>
+                </div>
+                
+                <!-- Zn/Ca Selectivity -->
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium text-gray-700">Selectivity (β A/B)</span>
+                        <div class="flex items-center gap-1">
+                            <select id="select-a2" class="calc-select param-input w-20 p-1 text-sm">
+                                <option value="P">P</option>
+                                <option value="S">S</option>
+                                <option value="Zn" selected>Zn</option>
+                                <option value="Mn">Mn</option>
+                                <option value="Fe">Fe</option>
+                                <option value="Mg">Mg</option>
+                                <option value="Ca">Ca</option>
+                                <option value="K">K</option>
+                                <option value="Na">Na</option>
+                            </select>
+                            <span class="text-gray-500">/</span>
+                            <select id="select-b2" class="calc-select param-input w-20 p-1 text-sm">
+                                <option value="P">P</option>
+                                <option value="S">S</option>
+                                <option value="Zn">Zn</option>
+                                <option value="Mn">Mn</option>
+                                <option value="Fe">Fe</option>
+                                <option value="Mg">Mg</option>
+                                <option value="Ca" selected>Ca</option>
+                                <option value="K">K</option>
+                                <option value="Na">Na</option>
+                            </select>
+                        </div>
+                        <span id="result-b-dynamic2" class="font-mono text-xl font-bold text-purple-600 bg-purple-50 px-3 py-1 rounded-md">...</span>
+                    </div>
+                    <code class="block text-xs text-gray-500 mt-2 bg-gray-100 p-2 rounded-md whitespace-nowrap overflow-x-auto">= D_element_A / D_element_B</code>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Column mapping for elements ---
+        const colMap = {
+            'P': 'B', 'S': 'C', 'Zn': 'D', 'Mn': 'E', 'Fe': 'F',
+            'Mg': 'G', 'Ca': 'H', 'K': 'I', 'Na': 'J'
+        };
+
+        // --- Get all result display elements ---
+        const result_e = document.getElementById('result-e');
+        const result_y_dynamic = document.getElementById('result-y-dynamic');
+        const result_b_dynamic = document.getElementById('result-b-dynamic');
+        const result_b_dynamic2 = document.getElementById('result-b-dynamic2');
+        
+        // --- Get all parameter input elements ---
+        const v_aq_initial_input = document.getElementById('v_aq_initial');
+        const v_org_initial_input = document.getElementById('v_org_initial');
+        const m_org_strip_sample_input = document.getElementById('m_org_strip_sample');
+        const v_aq_strip_input = document.getElementById('v_aq_strip');
+        const rho_org_input = document.getElementById('rho_org');
+        const rho_brine_input = document.getElementById('rho_brine');
+        
+        const dil_brine_input = document.getElementById('dil_brine');
+        const dil_aq_post_input = document.getElementById('dil_aq_post');
+        const dil_strip_input = document.getElementById('dil_strip');
+
+        // --- Get all dynamic select elements ---
+        const recovery_select = document.getElementById('recovery-select');
+        const select_a = document.getElementById('select-a');
+        const select_b = document.getElementById('select-b');
+        const select_a2 = document.getElementById('select-a2');
+        const select_b2 = document.getElementById('select-b2');
+
+        /**
+         * Safely gets the text content of a cell by ID and parses it as a float.
+         * Returns 0 if the element is not found or content is not a valid number.
+         */
+        function getCellFloat(id) {
+            const el = document.getElementById(id);
+            if (!el) {
+                console.error(`Element with ID ${id} not found.`);
+                return 0;
+            }
+            const value = parseFloat(el.innerText);
+            return isNaN(value) ? 0 : value;
+        }
+
+        function calculate() {
+            try {
+                // --- 1. Get all parameter values ---
+                const v_aq_initial = parseFloat(v_aq_initial_input.value);
+                const v_org_initial = parseFloat(v_org_initial_input.value);
+                const m_org_strip_sample = parseFloat(m_org_strip_sample_input.value);
+                const v_aq_strip = parseFloat(v_aq_strip_input.value);
+                const rho_org = parseFloat(rho_org_input.value);
+                // rho_brine is not used in these specific calculations, but we'd get it here.
+                
+                // --- 2. Get all dilution factors ---
+                const dil_brine = parseFloat(dil_brine_input.value);
+                const dil_aq_post = parseFloat(dil_aq_post_input.value);
+                const dil_strip = parseFloat(dil_strip_input.value);
+
+                // --- 3. Get all raw ICP values FOR ZINC (for E%) ---
+                const c_zn_brine_raw = getCellFloat('D2');
+                const c_zn_aq_post_raw = getCellFloat('D3');
+
+                // --- 4. Calculate True Concentrations (mg/L or ppm) ---
+                const c_zn_brine = c_zn_brine_raw * dil_brine;
+                const c_zn_aq_post = c_zn_aq_post_raw * dil_aq_post;
+
+                // --- 5. Perform Calculations ---
+
+                // 1. Zn Extraction Efficiency (E%) - Kept as a primary metric
+                const E_zn = (c_zn_brine - c_zn_aq_post) / c_zn_brine;
+                result_e.innerText = E_zn.toLocaleString('en-US', { style: 'percent', minimumFractionDigits: 1 });
+
+                // 2. Dynamic Overall Recovery (Y%)
+                const recElem = recovery_select.value;
+                const recCol = colMap[recElem];
+                
+                const c_rec_brine_raw = getCellFloat(recCol + '2');
+                const c_rec_strip_raw = getCellFloat(recCol + '4');
+
+                const c_rec_brine = c_rec_brine_raw * dil_brine;
+                const c_rec_strip = c_rec_strip_raw * dil_strip;
+
+                const total_initial_mass_rec = c_rec_brine * v_aq_initial; // (mg/L * mL)
+                const total_recovered_mass_rec = (c_rec_strip * v_aq_strip) * (v_org_initial * rho_org) / m_org_strip_sample;
+                
+                const Y_rec = total_initial_mass_rec === 0 ? 0 : total_recovered_mass_rec / total_initial_mass_rec;
+                result_y_dynamic.innerText = Y_rec.toLocaleString('en-US', { style: 'percent', minimumFractionDigits: 1 });
+
+
+                // 3. Dynamic Selectivity (β A/B)
+                function calculateSelectivity(selElemA, selElemB) {
+                    const selColA = colMap[selElemA];
+                    const selColB = colMap[selElemB];
+
+                    const c_A_brine = getCellFloat(selColA + '2') * dil_brine;
+                    const c_A_aq_post = getCellFloat(selColA + '3') * dil_aq_post;
+                    
+                    const c_B_brine = getCellFloat(selColB + '2') * dil_brine;
+                    const c_B_aq_post = getCellFloat(selColB + '3') * dil_aq_post;
+
+                    // D = (C_initial_aq - C_final_aq) / C_final_aq * (V_aq / V_org)
+                    const D_A = c_A_aq_post === 0 ? Infinity : (c_A_brine - c_A_aq_post) / c_A_aq_post * (v_aq_initial / v_org_initial);
+                    const D_B = c_B_aq_post === 0 ? Infinity : (c_B_brine - c_B_aq_post) / c_B_aq_post * (v_aq_initial / v_org_initial);
+                    
+                    const Beta_AB = D_B === 0 ? Infinity : D_A / D_B;
+                    
+                    if (!isFinite(Beta_AB)) return "N/A";
+                    return Beta_AB.toFixed(1);
+                }
+                
+                result_b_dynamic.innerText = calculateSelectivity(select_a.value, select_b.value);
+                result_b_dynamic2.innerText = calculateSelectivity(select_a2.value, select_b2.value);
+
+            } catch (error) {
+                // Handle errors if input is not a number
+                result_e.innerText = 'Error';
+                result_y_dynamic.innerText = 'Error';
+                result_b_dynamic.innerText = 'Error';
+                result_b_dynamic2.innerText = 'Error';
+                console.error("Calculation Error:", error);
+            }
+        }
+
+        // --- Add event listeners to ALL inputs ---
+        const allInputs = document.querySelectorAll('[contenteditable="true"], .param-input, .calc-select');
+        
+        allInputs.forEach(input => {
+            // Recalculate when user types or changes a value
+            input.addEventListener('keyup', calculate);
+            input.addEventListener('change', calculate); // For number inputs
+            
+            // Basic input sanitization: prevent line breaks in contenteditable
+            if (input.isContentEditable) {
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        input.blur(); // Unfocus the cell
+                    }
+                });
+            }
+        });
+
+        // Initial calculation on page load
+        window.onload = calculate;
+
+    </script>
+</body>
+</html>
+
+
+

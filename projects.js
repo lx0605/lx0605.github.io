@@ -48,6 +48,19 @@ const projectsContent = [
                      A tool to calculate the partial correlation matrix based on user input can be quite helpful.`,
         technologies: "JavaScript, HTML, CSS",
         link: "partial-correlation.html"
-    }
+    },
     // Add more projects as needed
+
+    {
+        name: "ICP Measurements Analysis Tool for SX Experiments",
+        description: `A dynamic calculator for analyzing ICP measurements for solvent extraction (SX) experiments. 
+                1st row: composition of the baseline brine before experiment. 
+                2nd row: post-extraction solution composition after contacting with organic phase.
+                3rd row: composition of the stripping solution.
+                The tool computes the extraction efficiency, overall yield, and distribution coefficients for each element along with experimental parameters like volumes, masses, and densities.`,
+        technologies: "JavaScript, HTML, CSS",
+        link: "icp-analysis.html"        
+        
+    }
+
 ];
