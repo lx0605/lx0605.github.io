@@ -222,7 +222,7 @@
                             <span class="text-sm font-medium text-gray-700">Mass in Organic (mg)</span>
                             <span id="result-m-org" class="font-mono text-xl font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-md">...</span>
                         </div>
-                        <code class="block text-xs text-gray-500 mt-2 bg-gray-100 p-2 rounded-md whitespace-nowrap overflow-x-auto">= (C_initial - C_aq_post) * V_aq_initial</code>
+                        <code class="block text-xs text-gray-500 mt-2 bg-gray-100 p-2 rounded-md whitespace-nowrap overflow-x-auto">= (C_initial - C_aq_post) * V_aq_initial * rho_brine</code>
                     </div>
                     <!-- Mass in Strip -->
                     <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
@@ -453,8 +453,8 @@
                 const c_strip = getCellFloat(analysisCol + '4') * dil_strip;
 
                 // Mass calculations (mg)
-                const m_initial_brine = c_initial * v_aq_initial;
-                const m_org_total = (c_initial - c_aq_post) * v_aq_initial;
+                const m_initial_brine = c_initial * v_aq_initial * rho_brine;
+                const m_org_total = (c_initial - c_aq_post) * v_aq_initial * rho_brine;
                 
                 // Calculate total organic mass (g)
                 const total_org_mass = (v_org_initial * 1000) * rho_org; // (L * 1000 mL/L) * g/mL = g
