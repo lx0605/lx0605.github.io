@@ -79,7 +79,7 @@
         <!-- Header -->
         <div class="mb-6 p-6 bg-white rounded-xl shadow-lg border border-gray-200">
             <h1 class="text-3xl font-bold text-gray-900">Advanced Solvent Extraction (SX) Calculator</h1>
-            <p class="mt-2 text-lg text-gray-600">Enter your ICP data and experimental parameters to calculate real-time performance metrics.</p>
+            <p class="mt-2 text-lg text-gray-600">Enter your ICP data (as ppm mass/mass) and experimental parameters to calculate real-time performance metrics.</p>
         </div>
 
         <!-- Section: Experimental Parameters -->
@@ -117,7 +117,7 @@
 
         <!-- Section: ICP Data Input -->
         <div class="mb-6 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-            <h2 class="text-2xl font-semibold text-gray-800 p-6 border-b border-gray-200">ICP Data (in ppm)</h2>
+            <h2 class="text-2xl font-semibold text-gray-800 p-6 border-b border-gray-200">ICP Data (in ppm, mass/mass)</h2>
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-100">
@@ -222,7 +222,15 @@
                             <span class="text-sm font-medium text-gray-700">Mass in Organic (mg)</span>
                             <span id="result-m-org" class="font-mono text-xl font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-md">...</span>
                         </div>
-                        <code class="block text-xs text-gray-500 mt-2 bg-gray-100 p-2 rounded-md whitespace-nowrap overflow-x-auto">= (C_initial - C_aq_post) * V_aq_initial * rho_brine</code>
+                        <code class="block text-xs text-gray-500 mt-2 bg-gray-100 p-2 rounded-md whitespace-nowrap overflow-x-auto">= M_initial_brine - M_aq_post_brine</code>
+                    </div>
+                    <!-- Conc. in Organic (ppm) -->
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium text-gray-700">Conc. in Organic (ppm)</span>
+                            <span id="result-c-org-ppm" class="font-mono text-xl font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-md">...</span>
+                        </div>
+                        <code class="block text-xs text-gray-500 mt-2 bg-gray-100 p-2 rounded-md whitespace-nowrap overflow-x-auto">= M_org_total (mg) / M_org_total (kg)</code>
                     </div>
                     <!-- Mass in Strip -->
                     <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
@@ -230,7 +238,7 @@
                             <span class="text-sm font-medium text-gray-700">Mass in Strip (mg)</span>
                             <span id="result-m-strip" class="font-mono text-xl font-bold text-sky-600 bg-sky-50 px-3 py-1 rounded-md">...</span>
                         </div>
-                        <code class="block text-xs text-gray-500 mt-2 bg-gray-100 p-2 rounded-md whitespace-nowrap overflow-x-auto" title="(C_strip * V_strip) * (Total_Org_Mass / Sample_Org_Mass)">(C_strip * V_strip) * Scale Factor</code>
+                        <code class="block text-xs text-gray-500 mt-2 bg-gray-100 p-2 rounded-md whitespace-nowrap overflow-x-auto" title="(C_strip * M_strip_aq) * (Total_Org_Mass / Sample_Org_Mass)">(M_strip_sample) * Scale Factor</code>
                     </div>
                     <!-- Stripping Efficiency -->
                     <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
@@ -246,7 +254,7 @@
                             <span class="text-sm font-medium text-gray-700">Overall Yield (Y%)</span>
                             <span id="result-y-dynamic" class="font-mono text-xl font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-md">...</span>
                         </div>
-                        <code class="block text-xs text-gray-500 mt-2 bg-gray-100 p-2 rounded-md whitespace-nowrap overflow-x-auto">= Mass_in_Strip / M_initial</code>
+                        <code class="block text-xs text-gray-500 mt-2 bg-gray-100 p-2 rounded-md whitespace-nowrap overflow-x-auto">= Mass_in_Strip / M_initial_brine</code>
                     </div>
                 </div>
             </div>
@@ -272,7 +280,7 @@
                             </select>
                             <span id="result-d-dynamic" class="font-mono text-xl font-bold text-orange-600 bg-orange-50 px-3 py-1 rounded-md">...</span>
                         </div>
-                        <code class="block text-xs text-gray-500 mt-2 bg-gray-100 p-2 rounded-md whitespace-nowrap overflow-x-auto">= ((X2-X3)/X3) * (V_aq / V_org)</code>
+                        <code class="block text-xs text-gray-500 mt-2 bg-gray-100 p-2 rounded-md whitespace-nowrap overflow-x-auto">= C_org (ppm) / C_aq (ppm)</code>
                     </div>
 
                     <!-- Dynamic Selectivity 1 -->
@@ -334,7 +342,7 @@
                                     <option value="Fe">Fe</option>
                                     <option value="Mg">Mg</option>
                                     <option value="Ca" selected>Ca</option>
-                                    <option value="K">K</option>
+                                    <option value="K">K</button>
                                     <option value="Na">Na</option>
                                 </select>
                             </div>
@@ -357,6 +365,7 @@
         // --- Get all result display elements ---
         const result_e_dynamic = document.getElementById('result-e-dynamic');
         const result_m_org = document.getElementById('result-m-org');
+        const result_c_org_ppm = document.getElementById('result-c-org-ppm');
         const result_m_strip = document.getElementById('result-m-strip');
         const result_s_dynamic = document.getElementById('result-s-dynamic');
         const result_y_dynamic = document.getElementById('result-y-dynamic');
@@ -407,86 +416,130 @@
         }
 
         /**
-         * Formats a number as mass (mg).
+         * Formats a number as mass (mg) or ppm.
          */
-        function formatMass(value) {
+        function formatValue(value) {
             if (!isFinite(value) || isNaN(value)) return "N/A";
             return value.toFixed(2);
         }
 
         /**
-         * Calculates the Distribution Coefficient (D) for a given element.
-         * D = ((C_initial - C_final) / C_final) * (V_aq / V_org)
+         * Calculates mass-based properties for a given element.
+         * This is a helper to get values for D and Selectivity.
          */
-        function calculateDistributionCoefficient(elem, dil_brine, dil_aq_post, v_aq, v_org) {
+        function getElementMassProperties(elem, params) {
             const col = colMap[elem];
-            const c_brine = getCellFloat(col + '2') * dil_brine;
-            const c_aq_post = getCellFloat(col + '3') * dil_aq_post;
+            const c_initial = getCellFloat(col + '2') * params.dil_brine;     // ppm (mg/kg)
+            const c_aq_post = getCellFloat(col + '3') * params.dil_aq_post;   // ppm (mg/kg)
 
-            if (c_aq_post === 0) return Infinity; // Avoid division by zero
+            // Calculate masses in mg
+            const m_initial_brine = c_initial * params.m_brine_kg;
+            const m_aq_post = c_aq_post * params.m_brine_kg; // Assuming V_aq and rho_aq are constant
+            const m_org_total = m_initial_brine - m_aq_post;
+
+            return { m_initial_brine, m_aq_post, m_org_total };
+        }
+
+        /**
+         * Calculates the Distribution Coefficient (D) for a given element.
+         * D = C_org(ppm) / C_aq(ppm)
+         */
+        function calculateDistributionCoefficient(elem, params) {
+            // Get C_aq in ppm (mg/kg)
+            const col = colMap[elem];
+            const C_aq_ppm = getCellFloat(col + '3') * params.dil_aq_post;   // ppm (mg/kg)
             
-            const D = ((c_brine - c_aq_post) / c_aq_post) * (v_aq / v_org);
+            // Get C_org in ppm (mg/kg)
+            const { m_org_total } = getElementMassProperties(elem, params);
+            const C_org_ppm = params.m_org_total_kg === 0 ? 0 : m_org_total / params.m_org_total_kg;
+
+            if (C_aq_ppm === 0) return Infinity; // Avoid division by zero
+            
+            const D = C_org_ppm / C_aq_ppm;
             return D;
         }
 
         function calculate() {
             try {
-                // --- 1. Get all parameter values ---
-                const v_aq_initial = parseFloat(v_aq_initial_input.value) / 1000; // L
-                const v_org_initial = parseFloat(v_org_initial_input.value) / 1000; // L
-                const rho_brine = parseFloat(rho_brine_input.value); // g/mL
-                const rho_org = parseFloat(rho_org_input.value); // g/mL (or kg/L)
-                const m_org_strip_sample = parseFloat(m_org_strip_sample_input.value); // g
-                const v_aq_strip = parseFloat(v_aq_strip_input.value) / 1000; // L
+                // --- 1. Get all parameter values and convert to base units (kg, L) ---
+                // Note: g/mL is numerically equivalent to kg/L
+                const rho_brine_kgL = parseFloat(rho_brine_input.value);
+                const rho_org_kgL = parseFloat(rho_org_input.value);
+                const rho_strip_kgL = 1.0; // Density of water strip solution
+                
+                const v_aq_initial_L = parseFloat(v_aq_initial_input.value) / 1000;
+                const v_org_initial_L = parseFloat(v_org_initial_input.value) / 1000;
+                const v_aq_strip_L = parseFloat(v_aq_strip_input.value) / 1000;
+                
+                const m_org_strip_sample_g = parseFloat(m_org_strip_sample_input.value);
                 
                 // --- 2. Get all dilution factors ---
                 const dil_brine = parseFloat(dil_brine_input.value);
                 const dil_aq_post = parseFloat(dil_aq_post_input.value);
                 const dil_strip = parseFloat(dil_strip_input.value);
 
-                // --- 3. Perform Element-Specific Analysis ---
+                // --- 3. Calculate key phase masses ---
+                const m_brine_kg = v_aq_initial_L * rho_brine_kgL;
+                const m_org_total_g = (v_org_initial_L * 1000) * rho_org_kgL; // (L * 1000 mL/L) * g/mL = g
+                const m_org_total_kg = m_org_total_g / 1000;
+                const m_strip_aq_kg = v_aq_strip_L * rho_strip_kgL;
+
+                // --- 4. Perform Element-Specific Analysis ---
                 const analysisElem = analysis_select.value;
                 const analysisCol = colMap[analysisElem];
                 
-                const c_initial = getCellFloat(analysisCol + '2') * dil_brine;
-                const c_aq_post = getCellFloat(analysisCol + '3') * dil_aq_post;
-                const c_strip = getCellFloat(analysisCol + '4') * dil_strip;
+                // Get concentrations in ppm (mg/kg)
+                const c_initial_ppm = getCellFloat(analysisCol + '2') * dil_brine;
+                const c_aq_post_ppm = getCellFloat(analysisCol + '3') * dil_aq_post;
+                const c_strip_ppm = getCellFloat(analysisCol + '4') * dil_strip;
 
                 // Mass calculations (mg)
-                const m_initial_brine = c_initial * v_aq_initial * rho_brine;
-                const m_org_total = (c_initial - c_aq_post) * v_aq_initial * rho_brine;
+                const m_initial_brine_mg = c_initial_ppm * m_brine_kg;
+                const m_aq_post_mg = c_aq_post_ppm * m_brine_kg; // Assuming V_aq and rho_aq are constant
+                const m_org_total_mg = m_initial_brine_mg - m_aq_post_mg;
                 
-                // Calculate total organic mass (g)
-                const total_org_mass = (v_org_initial * 1000) * rho_org; // (L * 1000 mL/L) * g/mL = g
-                // Calculate mass scale-up ratio
-                const mass_ratio = total_org_mass / m_org_strip_sample;
-                // Calculate total mass recovered in strip (mg)
-                const m_strip_total = (c_strip * v_aq_strip) * mass_ratio;
+                // Conc. in Org (ppm)
+                const c_org_ppm = m_org_total_kg === 0 ? 0 : m_org_total_mg / m_org_total_kg;
+
+                // Mass in Strip (mg)
+                const m_strip_sample_mg = c_strip_ppm * m_strip_aq_kg;
+                const mass_scale_factor = m_org_total_g / m_org_strip_sample_g;
+                const m_strip_total_mg = m_strip_sample_mg * mass_scale_factor;
 
                 // Percentage calculations
-                const E_percent = m_initial_brine === 0 ? 0 : m_org_total / m_initial_brine;
-                const S_percent = m_org_total === 0 ? 0 : m_strip_total / m_org_total;
-                const Y_percent = m_initial_brine === 0 ? 0 : m_strip_total / m_initial_brine;
+                const E_percent = m_initial_brine_mg === 0 ? 0 : m_org_total_mg / m_initial_brine_mg;
+                const S_percent = m_org_total_mg === 0 ? 0 : m_strip_total_mg / m_org_total_mg;
+                const Y_percent = m_initial_brine_mg === 0 ? 0 : m_strip_total_mg / m_initial_brine_mg;
 
                 // Update UI
                 result_e_dynamic.innerText = formatPercent(E_percent);
-                result_m_org.innerText = formatMass(m_org_total);
-                result_m_strip.innerText = formatMass(m_strip_total);
+                result_m_org.innerText = formatValue(m_org_total_mg);
+                result_c_org_ppm.innerText = formatValue(c_org_ppm);
+                result_m_strip.innerText = formatValue(m_strip_total_mg);
                 result_s_dynamic.innerText = formatPercent(S_percent);
                 result_y_dynamic.innerText = formatPercent(Y_percent);
 
                 
-                // --- 4. Perform Comparative Analysis ---
+                // --- 5. Perform Comparative Analysis ---
                 
+                // Create a parameters object to pass to helper functions
+                const calcParams = {
+                    v_aq_initial_L,
+                    v_org_initial_L,
+                    m_brine_kg,
+                    m_org_total_kg, // <-- ADDED for mass-based D
+                    dil_brine,
+                    dil_aq_post
+                };
+
                 // Dynamic Distribution Coefficient (D)
-                const d_Elem = d_select.value;
-                const D_dynamic = calculateDistributionCoefficient(d_Elem, dil_brine, dil_aq_post, v_aq_initial, v_org_initial);
+                const D_dynamic = calculateDistributionCoefficient(d_select.value, calcParams);
                 result_d_dynamic.innerText = isFinite(D_dynamic) ? D_dynamic.toFixed(2) : "N/A";
                 
                 // Dynamic Selectivity (β A/B)
-                function calculateSelectivity(selElemA, selElemB) {
-                    const D_A = calculateDistributionCoefficient(selElemA, dil_brine, dil_aq_post, v_aq_initial, v_org_initial);
-                    const D_B = calculateDistributionCoefficient(selElemB, dil_brine, dil_aq_post, v_aq_initial, v_org_initial);
+                function calculateSelectivity(selElemA, selElemB, params) {
+                    const D_A = calculateDistributionCoefficient(selElemA, params);
+                    const D_B = calculateDistributionCoefficient(selElemB, params);
                     
                     const Beta_AB = D_B === 0 ? Infinity : D_A / D_B;
                     
@@ -494,8 +547,8 @@
                     return Beta_AB.toFixed(1);
                 }
                 
-                result_b_dynamic.innerText = calculateSelectivity(select_a.value, select_b.value);
-                result_b_dynamic2.innerText = calculateSelectivity(select_a2.value, select_b2.value);
+                result_b_dynamic.innerText = calculateSelectivity(select_a.value, select_b.value, calcParams);
+                result_b_dynamic2.innerText = calculateSelectivity(select_a2.value, select_b2.value, calcParams);
 
             } catch (error) {
                 // Handle errors if input is not a number
