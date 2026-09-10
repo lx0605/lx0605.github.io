@@ -7,7 +7,7 @@ const projectsContent = [
     "category": "Research & Simulation Frameworks",
     "featured": true,
     "tagline": "End-to-end differentiable compositional reservoir simulation in JAX with reverse-mode automatic differentiation.",
-    "description": "<p><strong>res_sim_py</strong> is an open-source, differentiable reservoir simulation framework implemented in Python using <strong>JAX</strong>. It combines physics-based multiphase compositional transport, flash thermodynamics, and Newton-Raphson implicit solvers with exact reverse-mode automatic differentiation (AD), eliminating the computational burden of numerical perturbation and finite-difference approximations.</p><p>The framework integrates an adjoint-state inverse parameter estimation engine with a <strong>2D Discrete Cosine Transform (DCT)</strong> spectral basis parameterization. In high-contrast benchmark tests, this formulation achieves <strong>97.3% accuracy</strong> in reconstructing complex heterogeneous permeability fields from sparse production data, while enforcing physical porosity-permeability constraints and wellbore conditioning.</p>",
+    "description": "<p><strong>res_sim_py</strong> is a differentiable reservoir simulation framework implemented in Python using <strong>JAX</strong>. It combines physics-based multiphase compositional transport, flash thermodynamics, and Newton-Raphson implicit solvers with exact reverse-mode automatic differentiation (AD), eliminating the computational burden of numerical perturbation and finite-difference approximations.</p><p>The framework integrates an adjoint-state inverse parameter estimation engine with a <strong>2D Discrete Cosine Transform (DCT)</strong> spectral basis parameterization. In high-contrast benchmark tests, this formulation achieves <strong>97.3% accuracy</strong> in reconstructing complex heterogeneous permeability fields from sparse production data, while enforcing physical porosity-permeability constraints and wellbore conditioning.</p>",
     "technologies": [
       "Python",
       "JAX",
@@ -23,9 +23,9 @@ const projectsContent = [
     "captions": [
       "2D DCT spectral basis history matching: True vs. inferred permeability fields, loss convergence, and production rate matching."
     ],
-    "link": "https://github.com/lx0605/res_sim_py",
-    "linkText": "View on GitHub \u2197",
-    "isExternal": true
+    "link": "",
+    "linkText": "",
+    "isExternal": false
   },
   {
     "id": "idw_interpolation",

@@ -73,8 +73,7 @@ const homeContent = `
           <span class="tech-pill">Python</span>
         </div>
         <div class="featured-spotlight-buttons">
-          <a href="#projects" class="btn btn-sm btn-primary nav-link-trigger" data-target="projects">View Technical Details</a>
-          <a href="https://github.com/lx0605/res_sim_py" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline">GitHub Repo ↗</a>
+          <a href="#projects" class="btn btn-sm btn-primary nav-link-trigger" data-target="projects">View Details →</a>
         </div>
       </div>
       <div class="featured-spotlight-media project-media-item" data-src="images/res_sim_dct_history.png" data-caption="res_sim_py: 2D DCT spectral basis history matching benchmark (97.3% match accuracy).">
